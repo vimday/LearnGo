@@ -23,6 +23,18 @@ func (v Vertex) Scaleval(f float64) {
 	v.Y = v.Y * f
 }
 
+type S struct {
+	data string
+}
+
+func (s S) Read() string {
+	return s.data
+}
+
+func (s *S) Write(str string) {
+	s.data = str
+}
+
 func main() {
 	// v是值类型
 	v := Vertex{3, 4}
@@ -47,4 +59,49 @@ func main() {
 	pn.Scaleval(10)
 
 	fmt.Println(pn.Abs())
+
+	sVals := map[int]S{1: {"A"}}
+
+	// 你只能通过值调用 Read
+	sVals[1].Read()
+
+	// 这不能编译通过：
+	//sVals[1].Write("test")
+
+	ss := S{"B"}
+	ss.Write("aa")
+
+	sPtrs := map[int]*S{1: {"A"}}
+
+	// 通过指针既可以调用 Read，也可以调用 Write 方法
+	sPtrs[1].Read()
+	sPtrs[1].Write("test")
+
+}
+
+type F interface {
+	f()
+}
+
+type S1 struct{}
+
+func (s S1) f() {}
+
+type S2 struct{}
+
+func (s *S2) f() {}
+func helloworld() {
+	s1Val := S1{}
+	s1Ptr := &S1{}
+	s2Val := S2{}
+	s2Ptr := &S2{}
+
+	var i F
+	i = s1Val
+	i = s1Ptr
+	i = s2Ptr
+
+	fmt.Println(i, s2Val)
+	//  下面代码无法通过编译。因为 s2Val 是一个值，而 S2 的 f 方法中没有使用值接收器
+	//   i = s2Vals
 }
